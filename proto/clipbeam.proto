@@ -1,0 +1,281 @@
+// ClipBeam Protocol v1
+// Defines cross-platform clipboard synchronization messages
+// between ClipBeam clients (Windows, Android, etc.)
+// This file is shared between all client implementations.
+
+syntax = "proto3";
+
+package clipbeam.v1;
+
+import "google/protobuf/timestamp.proto";
+
+option csharp_namespace = "ClipBeam.Proto";
+option java_multiple_files = true;
+option java_package = "com.clipbeam.proto";
+
+// -----------------------------------------------------------------------------
+// ENUMS
+// -----------------------------------------------------------------------------
+
+// Platform identifies the operating system of the peer device.
+enum Platform {
+  PLATFORM_UNSPECIFIED = 0;
+  PLATFORM_WINDOWS = 1;
+  PLATFORM_ANDROID = 2;
+}
+
+// Describes the type of clipboard content being transferred.
+enum ContentType {
+  CONTENT_TYPE_UNSPECIFIED = 0;
+  CONTENT_TYPE_TEXT = 1;
+  CONTENT_TYPE_IMAGE = 2;
+}
+
+// Supported image formats for image-type clips.
+enum ImageFormat {
+  IMAGE_FORMAT_UNSPECIFIED = 0;
+  IMAGE_FORMAT_PNG = 1;
+  IMAGE_FORMAT_WEBP = 2;
+  IMAGE_FORMAT_JPEG = 3;
+}
+
+// Compression applied to each chunk of data.
+enum ChunkCompression {
+  CHUNK_COMPRESSION_NONE = 0;
+  CHUNK_COMPRESSION_GZIP = 1;
+  CHUNK_COMPRESSION_ZSTD = 2;
+}
+
+// Standard EXIF orientation values for image rotation/mirroring.
+enum ExifOrientation {
+  EXIF_ORIENTATION_UNSPECIFIED = 0;
+  EXIF_ORIENTATION_NORMAL = 1;
+  EXIF_ORIENTATION_MIRROR_HORIZONTAL = 2;
+  EXIF_ORIENTATION_ROTATE_180 = 3;
+  EXIF_ORIENTATION_MIRROR_VERTICAL = 4;
+  EXIF_ORIENTATION_MIRROR_HORIZONTAL_ROTATE_270_CW = 5;
+  EXIF_ORIENTATION_ROTATE_90_CW = 6;
+  EXIF_ORIENTATION_MIRROR_HORIZONTAL_ROTATE_90_CW = 7;
+  EXIF_ORIENTATION_ROTATE_270_CW = 8;
+}
+
+// Hashing algorithms used to identify clip content.
+enum HashAlgo {
+  HASH_ALGO_UNSPECIFIED = 0;
+  HASH_ALGO_SHA256 = 1;
+}
+
+// Text normalization applied before transmission.
+enum TextNorm {
+  TEXT_NORM_UNSPECIFIED = 0;
+  TEXT_NORM_NFC_LF = 1; // Unicode NFC + LF line endings
+}
+
+// Authentication method used during handshake.
+enum AuthScheme {
+  AUTH_SCHEME_UNSPECIFIED = 0;
+  AUTH_SCHEME_TLS = 1;
+  AUTH_SCHEME_MTLS = 2;
+  AUTH_SCHEME_TOKEN = 3;
+}
+
+// Reasons for a negative acknowledgment (NACK).
+enum NackReason {
+  NACK_REASON_UNSPECIFIED = 0;
+  NACK_REASON_CRC_MISMATCH = 1;
+  NACK_REASON_TIMEOUT = 2;
+  NACK_REASON_FLOW_CONTROL = 3;
+  NACK_REASON_INTERNAL = 4;
+}
+
+// -----------------------------------------------------------------------------
+// VERSIONING & CAPABILITIES
+// -----------------------------------------------------------------------------
+
+// Semantic version of the ClipBeam client.
+message SemanticVersion {
+  uint32 major = 1;
+  uint32 minor = 2;
+  uint32 patch = 3;
+}
+
+// Declares the features supported by a peer during handshake.
+message Capabilities {
+  bool supports_images = 1;
+  uint32 preferred_chunk_bytes = 2;
+  optional uint32 max_chunk_bytes = 3;
+  bool supports_ack_window = 4;
+  bool supports_hash_dedup = 5;
+  repeated ContentType supported_types = 6;
+  repeated ChunkCompression supported_chunk_compressions = 7;
+  reserved 1000 to 1999;
+}
+
+// -----------------------------------------------------------------------------
+// AUTHENTICATION
+// -----------------------------------------------------------------------------
+
+// Token-based authentication (for LAN or offline pairing).
+message TokenAuth {
+  string token_id = 1; // Identifier of token type (e.g. "pairing")
+  bytes raw = 2;       // Token data (binary or UTF-8)
+}
+
+// TLS/mTLS authentication using certificate fingerprint.
+message TlsAuth {
+  bytes cert_fingerprint = 1; // SHA-256 hash of public cert/key
+}
+
+// -----------------------------------------------------------------------------
+// HASH
+// -----------------------------------------------------------------------------
+
+// Generic hash wrapper.
+message Hash {
+  HashAlgo algo = 1;
+  bytes value = 2; // Raw hash bytes, typically 32 bytes for SHA-256
+}
+
+// -----------------------------------------------------------------------------
+// HANDSHAKE
+// -----------------------------------------------------------------------------
+
+// Initial hello message sent by a peer to advertise its identity,
+// protocol version, and supported capabilities.
+message Hello {
+  string device_id = 1;           // Unique persistent device identifier
+  string device_name = 2;         // Human-readable device name
+  Platform platform = 3;          // Platform (Windows, Android, etc.)
+  SemanticVersion app_version = 4;
+  uint32 proto_version = 5;       // Protocol version used by this client
+  Capabilities capabilities = 6;  // Supported features
+  AuthScheme auth_scheme = 7;     // Authentication method used
+
+  // Optional authentication payloads.
+  oneof auth_details {
+    TokenAuth token = 10;
+    TlsAuth tls = 11;
+  }
+}
+
+// Acknowledgment from the receiver indicating whether the handshake succeeded.
+message HelloAck {
+  bool accepted = 1;
+  string reason = 2;                // Optional rejection reason
+  Capabilities negotiated = 3;      // Final agreed-upon capabilities
+}
+
+// -----------------------------------------------------------------------------
+// CLIP META
+// -----------------------------------------------------------------------------
+
+// Metadata describing an image.
+message ImageMeta {
+  ImageFormat format = 1;
+  uint32 width = 2;
+  uint32 height = 3;
+  ExifOrientation orientation = 4;
+  string mime = 5; // e.g. "image/png"
+}
+
+// Metadata describing the clipboard content being transferred.
+message ClipMeta {
+  string clip_id = 1;             // UUID identifying this clip instance
+  string origin_device_id = 2;    // Device that created this clip
+  uint64 seq = 3;                 // Monotonic sequence number
+
+  ContentType type = 4;           // Type of content
+  Hash content_hash = 5;          // Hash of normalized content
+  uint64 total_size = 6;          // Total size of content in bytes
+  google.protobuf.Timestamp created_utc = 7; // Creation time (UTC)
+  uint32 proto_version = 8;       // Protocol version used to generate this meta
+
+  optional ImageMeta image = 9;   // Present if type = IMAGE
+  optional TextNorm text_norm = 10;
+  optional string mime = 11;      // e.g. "text/plain; charset=utf-8"
+
+  reserved 1000 to 1999;
+}
+
+// -----------------------------------------------------------------------------
+// DATA & FLOW CONTROL
+// -----------------------------------------------------------------------------
+
+// Start of clip data transfer (includes metadata).
+message DataStart {
+  ClipMeta meta = 1;
+}
+
+// Chunk of clipboard data payload.
+message DataBody {
+  string clip_id = 1;
+  uint64 offset = 2;              // Byte offset from clip start
+  bytes data = 3;                 // Raw data bytes
+  bool last = 4;                  // True if this is the last chunk
+  ChunkCompression compression = 5;
+  fixed32 crc32c = 6;             // CRC32C of the uncompressed chunk
+}
+
+// Positive acknowledgment of received data.
+message Ack {
+  string clip_id = 1;
+  uint64 acked_up_to = 2;                 // Total bytes received (exclusive)
+  uint64 bytes_since_last_ack = 3;
+  uint32 chunks_since_last_ack = 4;
+  optional uint64 desired_inflight_bytes = 5;
+  optional uint32 desired_inflight_chunks = 6;
+}
+
+// Range of missing bytes (for retransmission).
+message ByteRange {
+  uint64 start = 1;
+  uint64 end_exclusive = 2;
+}
+
+// Negative acknowledgment requesting retransmission of ranges.
+message Nack {
+  string clip_id = 1;
+  repeated ByteRange ranges = 2;
+  NackReason code = 3;
+  string reason = 4;
+}
+
+// Keepalive request with timestamp.
+message Ping {
+  google.protobuf.Timestamp send_utc = 1;
+}
+
+// Keepalive response.
+message Pong {
+  google.protobuf.Timestamp echo_utc = 1;
+}
+
+// -----------------------------------------------------------------------------
+// ENVELOPE
+// -----------------------------------------------------------------------------
+
+// Multiplexed wrapper for all frame types exchanged in the Sync stream.
+// Allows adding new frame kinds in the future without changing the RPC.
+message Envelope {
+  oneof kind {
+    Hello hello = 1;
+    HelloAck hello_ack = 2;
+    DataStart data_start = 3;
+    DataBody data_body = 4;
+    Ack ack = 5;
+    Nack nack = 6;
+    Ping ping = 7;
+    Pong pong = 8;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// SERVICE
+// -----------------------------------------------------------------------------
+
+// Bidirectional streaming service used to synchronize clipboard data
+// between ClipBeam peers over gRPC. The stream starts with a handshake
+// (Hello / HelloAck) and continues with Data*, Ack, Nack, and Ping/Pong frames.
+service ClipSync {
+  rpc Sync (stream Envelope) returns (stream Envelope);
+}

@@ -6,4 +6,13 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Remove="Clips\Events\**" />
+    <Compile Remove="Devices\Events\**" />
+    <EmbeddedResource Remove="Clips\Events\**" />
+    <EmbeddedResource Remove="Devices\Events\**" />
+    <None Remove="Clips\Events\**" />
+    <None Remove="Devices\Events\**" />
+  </ItemGroup>
+
 </Project>

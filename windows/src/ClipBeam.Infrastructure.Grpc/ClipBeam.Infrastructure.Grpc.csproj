@@ -15,4 +15,8 @@
     <Folder Include="Protos\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\ClipBeam.Proto\ClipBeam.Proto.csproj" />
+  </ItemGroup>
+
 </Project>

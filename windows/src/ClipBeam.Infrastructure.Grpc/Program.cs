@@ -1,4 +1,5 @@
 using ClipBeam.Infrastructure.Grpc.Services;
+using ClipBeam.Proto;
 
 var builder = WebApplication.CreateBuilder(args);
 

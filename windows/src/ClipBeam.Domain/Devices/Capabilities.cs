@@ -34,7 +34,7 @@ namespace ClipBeam.Domain.Devices
             if (types.Length == 0)
                 throw new DomainException("At least one SupportedType is required.");
 
-            var compressions = (supportedCompressions ?? Array.Empty<ChunkCompression>())
+            var compressions = (supportedCompressions ?? [])
                 .Distinct()
                 .ToArray();
 

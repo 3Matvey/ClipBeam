@@ -16,7 +16,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClipBeam.Proto", "src\ClipB
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClipBeam.Infrastructure.Grpc", "src\ClipBeam.Infrastructure.Grpc\ClipBeam.Infrastructure.Grpc.csproj", "{2D8F3D96-8EA2-400E-8344-068BC0FB6B3F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClipBeam.Clipboard", "src\ClipBeam.Platform.Windows.Clipboard\ClipBeam.Clipboard.csproj", "{A7C1AC3F-BC90-4DD6-A552-10F1A78A74B3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClipBeam.Platform.Windows.Clipboard", "src\ClipBeam.Platform.Windows.Clipboard\ClipBeam.Platform.Windows.Clipboard.csproj", "{A7C1AC3F-BC90-4DD6-A552-10F1A78A74B3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClipBeam.Presentation.WinForms", "src\ClipBeam.Presentation.WinForms\ClipBeam.Presentation.WinForms.csproj", "{675E908A-C536-44FA-B9A1-0B298B121C84}"
 EndProject

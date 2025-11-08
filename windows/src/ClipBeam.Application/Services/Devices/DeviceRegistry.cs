@@ -7,7 +7,7 @@ namespace ClipBeam.Application.Services.Devices //TODO
     /// Application-level registry for trusted devices built on top of IDeviceStore.
     /// Contains higher-level operations used across the application.
     /// </summary>
-    internal class DeviceRegistry(IDeviceStore store)
+    public class DeviceRegistry(IDeviceStore store)
     {
         private readonly IDeviceStore _store = store ?? throw new ArgumentNullException(nameof(store));
 

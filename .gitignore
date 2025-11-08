@@ -361,4 +361,3 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
-/windows/src/ClipBeam.Platform.Windows.Clipboard/StaThreadRunner.cs

@@ -6,4 +6,15 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="Services\Dtos\Mapping\" />
+    <Folder Include="Services\Policy\" />
+    <Folder Include="Services\Sync\" />
+    <Folder Include="Services\Pairing\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ClipBeam.Domain\ClipBeam.Domain.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="../proto/clipbeam.proto" />
+  </Folder>
+  <Project Path="src/ClipBeam.Application/ClipBeam.Application.csproj" />
+  <Project Path="src/ClipBeam.Domain/ClipBeam.Domain.csproj" />
+  <Project Path="src/ClipBeam.Host.Win/ClipBeam.Host.Win.csproj" />
+  <Project Path="src/ClipBeam.Infrastructure.Grpc/ClipBeam.Infrastructure.Grpc.csproj" />
+  <Project Path="src/ClipBeam.Platform.Windows.Clipboard/ClipBeam.Platform.Windows.Clipboard.csproj" />
+  <Project Path="src/ClipBeam.Presentation.WinForms/ClipBeam.Presentation.WinForms.csproj" />
+  <Project Path="src/ClipBeam.Proto/ClipBeam.Proto.csproj" />
+</Solution>

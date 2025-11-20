@@ -9,8 +9,11 @@
   <ItemGroup>
     <Folder Include="Services\Dtos\Mapping\" />
     <Folder Include="Services\Policy\" />
-    <Folder Include="Services\Sync\" />
     <Folder Include="Services\Pairing\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.IO.Hashing" Version="10.0.0" />
   </ItemGroup>
 
   <ItemGroup>

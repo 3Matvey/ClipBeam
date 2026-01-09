@@ -39,12 +39,6 @@ enum ImageFormat {
   IMAGE_FORMAT_JPEG = 3;
 }
 
-// Compression applied to each chunk of data.
-enum ChunkCompression {
-  CHUNK_COMPRESSION_NONE = 0;
-  CHUNK_COMPRESSION_GZIP = 1;
-  CHUNK_COMPRESSION_ZSTD = 2;
-}
 
 // Standard EXIF orientation values for image rotation/mirroring.
 enum ExifOrientation {
@@ -79,15 +73,6 @@ enum AuthScheme {
   AUTH_SCHEME_TOKEN = 3;
 }
 
-// Reasons for a negative acknowledgment (NACK).
-enum NackReason {
-  NACK_REASON_UNSPECIFIED = 0;
-  NACK_REASON_CRC_MISMATCH = 1;
-  NACK_REASON_TIMEOUT = 2;
-  NACK_REASON_FLOW_CONTROL = 3;
-  NACK_REASON_INTERNAL = 4;
-}
-
 // -----------------------------------------------------------------------------
 // VERSIONING & CAPABILITIES
 // -----------------------------------------------------------------------------
@@ -101,13 +86,10 @@ message SemanticVersion {
 
 // Declares the features supported by a peer during handshake.
 message Capabilities {
-  bool supports_images = 1;
-  uint32 preferred_chunk_bytes = 2;
-  optional uint32 max_chunk_bytes = 3;
-  bool supports_ack_window = 4;
-  bool supports_hash_dedup = 5;
-  repeated ContentType supported_types = 6;
-  repeated ChunkCompression supported_chunk_compressions = 7;
+  uint32 preferred_chunk_bytes = 1;
+  optional uint32 max_chunk_bytes = 2;
+  bool supports_hash_dedup = 3;
+  repeated ContentType supported_types = 4;
   reserved 1000 to 1999;
 }
 
@@ -162,7 +144,7 @@ message Hello {
 message HelloAck {
   bool accepted = 1;
   string reason = 2;                // Optional rejection reason
-  Capabilities negotiated = 3;      // Final agreed-upon capabilities
+  optional Capabilities negotiated = 3;      // Final agreed-upon capabilities
 }
 
 // -----------------------------------------------------------------------------
@@ -185,7 +167,7 @@ message ClipMeta {
   uint64 seq = 3;                 // Monotonic sequence number
 
   ContentType type = 4;           // Type of content
-  Hash content_hash = 5;          // Hash of normalized content
+  optional Hash content_hash = 5;          // Hash of normalized content
   uint64 total_size = 6;          // Total size of content in bytes
   google.protobuf.Timestamp created_utc = 7; // Creation time (UTC)
   uint32 proto_version = 8;       // Protocol version used to generate this meta
@@ -212,33 +194,8 @@ message DataBody {
   uint64 offset = 2;              // Byte offset from clip start
   bytes data = 3;                 // Raw data bytes
   bool last = 4;                  // True if this is the last chunk
-  ChunkCompression compression = 5;
-  fixed32 crc32c = 6;             // CRC32C of the uncompressed chunk
 }
 
-// Positive acknowledgment of received data.
-message Ack {
-  string clip_id = 1;
-  uint64 acked_up_to = 2;                 // Total bytes received (exclusive)
-  uint64 bytes_since_last_ack = 3;
-  uint32 chunks_since_last_ack = 4;
-  optional uint64 desired_inflight_bytes = 5;
-  optional uint32 desired_inflight_chunks = 6;
-}
-
-// Range of missing bytes (for retransmission).
-message ByteRange {
-  uint64 start = 1;
-  uint64 end_exclusive = 2;
-}
-
-// Negative acknowledgment requesting retransmission of ranges.
-message Nack {
-  string clip_id = 1;
-  repeated ByteRange ranges = 2;
-  NackReason code = 3;
-  string reason = 4;
-}
 
 // Keepalive request with timestamp.
 message Ping {
@@ -262,10 +219,8 @@ message Envelope {
     HelloAck hello_ack = 2;
     DataStart data_start = 3;
     DataBody data_body = 4;
-    Ack ack = 5;
-    Nack nack = 6;
-    Ping ping = 7;
-    Pong pong = 8;
+    Ping ping = 5;
+    Pong pong = 6;
   }
 }
 

@@ -7,13 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Services\Dtos\Mapping\" />
-    <Folder Include="Services\Policy\" />
-    <Folder Include="Services\Pairing\" />
+    <PackageReference Include="QRCoder" Version="1.7.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ClipBeam.Domain\ClipBeam.Domain.csproj" />
+    <ProjectReference Include="..\src\ClipBeam.Application\ClipBeam.Application.csproj" />
   </ItemGroup>
 
 </Project>

@@ -2,6 +2,7 @@
 using ClipBeam.Domain.Clips.Image;
 using ClipBeam.Domain.Clips.Text;
 using ClipBeam.Domain.Shared;
+using System.Text;
 
 namespace ClipBeam.Domain.Clips
 {
@@ -73,8 +74,43 @@ namespace ClipBeam.Domain.Clips
                 contentHash: hash,
                 totalSize: (ulong)content.Raw.Length,
                 createdUtc: createdUtc,
-                protoVersion: CurrentProtoVersion
+                protoVersion: CurrentProtoVersion,
+                imageMeta: imageMeta
             );
+
+            return new Clip(meta, content);
+        }
+
+        public static Clip FromMeta(
+            ClipMeta meta,
+            ReadOnlyMemory<byte> rawBytes,
+            IHasherProvider hashers)
+        {
+            ArgumentNullException.ThrowIfNull(meta);
+            ArgumentNullException.ThrowIfNull(hashers);
+
+            if ((ulong)rawBytes.Length != meta.TotalSize)
+                throw new DomainException("Raw length doesn't match ClipMeta.TotalSize.");
+
+            var hasher = hashers.Get(HashAlgo.Sha256);
+            var actualHash = hasher.Compute(rawBytes.Span);
+            if (!meta.ContentHash.Equals(actualHash))
+                throw new DomainException("Content hash mismatch on restore.");
+
+            ClipContent content = meta.Type switch
+            {
+                ContentType.Text =>
+                    TextClipContent.FromRaw(
+                        Encoding.UTF8.GetString(rawBytes.Span)), 
+
+                ContentType.Image =>
+                    new ImageClipContent(
+                        meta.ImageMeta
+                            ?? throw new DomainException("ImageMeta is required for image clip."),
+                        rawBytes),
+
+                _ => throw new NotSupportedException($"Unsupported content type {meta.Type}")
+            };
 
             return new Clip(meta, content);
         }

@@ -1,4 +1,5 @@
-﻿using ClipBeam.Domain.Shared;
+﻿using ClipBeam.Domain.Clips.Image;
+using ClipBeam.Domain.Shared;
 
 namespace ClipBeam.Domain.Clips
 {
@@ -13,6 +14,8 @@ namespace ClipBeam.Domain.Clips
         public DateTime CreatedUtc { get; }
         public uint ProtoVersion { get; }
 
+        public ImageMeta? ImageMeta { get; }
+
         internal ClipMeta(
             Guid clipId,
             string originDeviceId,
@@ -21,7 +24,8 @@ namespace ClipBeam.Domain.Clips
             Hash contentHash,
             ulong totalSize,
             DateTime createdUtc,
-            uint protoVersion)
+            uint protoVersion,
+            ImageMeta? imageMeta = null)
         {
             if (clipId == Guid.Empty)
                 throw new DomainException("ClipId is required.");
@@ -49,6 +53,7 @@ namespace ClipBeam.Domain.Clips
             TotalSize = totalSize;
             CreatedUtc = createdUtc;
             ProtoVersion = protoVersion;
+            ImageMeta = imageMeta;
         }
     }
 }

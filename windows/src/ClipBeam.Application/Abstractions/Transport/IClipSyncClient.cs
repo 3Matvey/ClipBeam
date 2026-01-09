@@ -39,10 +39,9 @@ namespace ClipBeam.Application.Abstractions.Transport
         /// <param name="offset">Byte offset within the clip content for this chunk.</param>
         /// <param name="data">A readonly memory buffer containing the chunk bytes.</param>
         /// <param name="last">True if this chunk is the final chunk in the transfer.</param>
-        /// <param name="crc32c">CRC32C checksum for the chunk. Used by receivers to verify integrity.</param>
         /// <param name="ct">Cancellation token to cancel the send operation.</param>
         /// <returns>A task that completes when the chunk has been sent.</returns>
-        Task SendChunkAsync(Guid clipId, ulong offset, ReadOnlyMemory<byte> data, bool last, uint crc32c, CancellationToken ct);
+        Task SendChunkAsync(Guid clipId, ulong offset, ReadOnlyMemory<byte> data, bool last, CancellationToken ct);
 
         /// <summary>
         /// Sends an acknowledgement (ACK) indicating that the receiver has persisted data up to the specified offset.

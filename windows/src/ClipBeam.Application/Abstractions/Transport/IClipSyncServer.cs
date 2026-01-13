@@ -8,7 +8,5 @@ namespace ClipBeam.Application.Abstractions.Transport
         Task OnHelloAsync(Device remote, CancellationToken ct);
         Task OnDataStartAsync(ClipMeta meta, CancellationToken ct);
         Task OnDataBodyAsync(string clipId, ulong offset, ReadOnlyMemory<byte> data, bool last, CancellationToken ct);
-        Task OnAckAsync(string clipId, ulong ackedUpTo, CancellationToken ct);
-        Task OnNackAsync(string clipId, IEnumerable<(ulong start, ulong end)> ranges, CancellationToken ct);
     }
 }

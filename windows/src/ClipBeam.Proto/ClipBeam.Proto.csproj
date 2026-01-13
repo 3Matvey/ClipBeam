@@ -7,17 +7,14 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Google.Protobuf" Version="3.*" />
-		<PackageReference Include="Grpc.Tools" Version="2.*" PrivateAssets="All" />
-		<PackageReference Include="Grpc.Net.Client" Version="2.*" />
-		<PackageReference Include="Grpc.AspNetCore" Version="2.*" />
+		<PackageReference Include="Google.Protobuf" Version="3.33.3" />
+		<PackageReference Include="Grpc.Tools" Version="2.76.0" PrivateAssets="All" />
+		<PackageReference Include="Grpc.Net.Client" Version="2.76.0" />
+		<PackageReference Include="Grpc.AspNetCore" Version="2.76.0" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<Protobuf Include="..\..\..\proto\clipbeam.proto"
-				  GrpcServices="Both"
-				  CompileOutputs="true"
-				  AdditionalImportDirs="..\..\..\proto" />
+		<Protobuf Include="..\..\..\proto\clipbeam.proto" GrpcServices="Both" CompileOutputs="true" AdditionalImportDirs="..\..\..\proto" />
 	</ItemGroup>
 
 </Project>

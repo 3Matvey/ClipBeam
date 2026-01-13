@@ -21,7 +21,7 @@ namespace ClipBeam.Application.Services.Sync
 
             for (int i = 0; i < raw.Length; i += ChunckSize)
             {
-                int len = Math.Min(ChunckSize, raw.Length - 1);
+                int len = Math.Min(ChunckSize, raw.Length - i);
                 bool last = (i + len) == raw.Length;
 
                 yield return (offset, raw.Slice(i, len), last);

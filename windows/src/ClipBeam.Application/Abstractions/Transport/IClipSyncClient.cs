@@ -44,24 +44,6 @@ namespace ClipBeam.Application.Abstractions.Transport
         Task SendChunkAsync(Guid clipId, ulong offset, ReadOnlyMemory<byte> data, bool last, CancellationToken ct);
 
         /// <summary>
-        /// Sends an acknowledgement (ACK) indicating that the receiver has persisted data up to the specified offset.
-        /// </summary>
-        /// <param name="clipId">Identifier of the clip for which the acknowledgement applies.</param>
-        /// <param name="ackedUpTo">The highest byte offset (inclusive or exclusive per protocol) that the receiver has accepted.</param>
-        /// <param name="ct">Cancellation token to cancel the send operation.</param>
-        /// <returns>A task that completes when the ack has been sent.</returns>
-        Task SendAckAsync(Guid clipId, ulong ackedUpTo, CancellationToken ct);
-
-        /// <summary>
-        /// Sends a negative acknowledgement (NACK) containing ranges of bytes that were not received/validated.
-        /// </summary>
-        /// <param name="clipId">Identifier of the clip for which the NACK applies.</param>
-        /// <param name="ranges">A collection of (start, end) ranges representing missing or corrupted byte ranges.</param>
-        /// <param name="ct">Cancellation token to cancel the send operation.</param>
-        /// <returns>A task that completes when the NACK has been sent.</returns>
-        Task SendNackAsync(Guid clipId, IEnumerable<(ulong start, ulong end)> ranges, CancellationToken ct);
-
-        /// <summary>
         /// Stops and disposes the transport client, closing any active session.
         /// </summary>
         /// <param name="ct">Cancellation token to cancel the stop operation.</param>

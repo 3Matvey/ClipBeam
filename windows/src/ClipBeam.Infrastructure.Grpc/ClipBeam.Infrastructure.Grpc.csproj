@@ -7,15 +7,17 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Grpc.AspNetCore" Version="2.64.0" />
+    <PackageReference Include="Grpc.AspNetCore" Version="2.76.0" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Properties\" />
     <Folder Include="Protos\" />
+    <Folder Include="Transport\" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ClipBeam.Application\ClipBeam.Application.csproj" />
     <ProjectReference Include="..\ClipBeam.Proto\ClipBeam.Proto.csproj" />
   </ItemGroup>
 

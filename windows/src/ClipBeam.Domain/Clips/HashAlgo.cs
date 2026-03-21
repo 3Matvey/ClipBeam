@@ -3,6 +3,7 @@
     public enum HashAlgo
     {
         Unspecified = 0,
-        Sha256 = 1
+        Sha256 = 1,
+        Crc32 = 2
     }
 }

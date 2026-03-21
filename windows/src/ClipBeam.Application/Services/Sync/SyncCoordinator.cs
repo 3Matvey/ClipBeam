@@ -6,16 +6,16 @@ namespace ClipBeam.Application.Services.Sync
 {
     public sealed class SyncCoordinator(
         IClipSyncClient client,
-        IClipSyncServer server,
         ChunckAssembler assembler)
     {
-        public async Task SendAsync(Clip clip, Device target, CancellationToken ct)
+        public async Task SendAsync(Clip clip, Device local, Device target, CancellationToken ct)
         {
             ArgumentNullException.ThrowIfNull(clip);
+            ArgumentNullException.ThrowIfNull(local);
             ArgumentNullException.ThrowIfNull(target);
 
             await client.StartAsync(target, ct).ConfigureAwait(false);
-            await client.SendHelloAsync(target, ct).ConfigureAwait(false);
+            await client.SendHelloAsync(local, ct).ConfigureAwait(false);
             await client.SendDataStartAsync(clip, ct).ConfigureAwait(false);
 
             foreach (var (Offset, Data, isLast) in TransferManager.Split(clip))
@@ -25,11 +25,8 @@ namespace ClipBeam.Application.Services.Sync
                     Offset,
                     Data,
                     isLast,
-                    ct).ConfigureAwait(false);  
+                    ct).ConfigureAwait(false);
             }
-
-            // TODO: ACK/NACK позже
-
         }
 
         public Task OnDataStartAsync(ClipMeta meta, CancellationToken ct)

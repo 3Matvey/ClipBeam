@@ -5,22 +5,23 @@ namespace ClipBeam.Domain.Devices
 {
     public sealed class Capabilities
     {
-        public bool SupportsImages { get; }
+        //public bool SupportsImages { get; }
         public uint PreferredChunkBytes { get; }
         public uint? MaxChunkBytes { get; }
         public bool SupportsAckWindow { get; }
         public bool SupportsHashDedup { get; }
         public IReadOnlyCollection<ContentType> SupportedTypes { get; }
-        public IReadOnlyCollection<ChunkCompression> SupportedChunkCompressions { get; }
+        //public IReadOnlyCollection<ChunkCompression> SupportedChunkCompressions { get; }
 
         public Capabilities(
-            bool supportsImages,
+          //  bool supportsImages,
             uint preferredChunkBytes,
             uint? maxChunkBytes,
-            bool supportsAckWindow,
+            //bool supportsAckWindow,
             bool supportsHashDedup,
-            IEnumerable<ContentType> supportedTypes,
-            IEnumerable<ChunkCompression> supportedCompressions)
+            IEnumerable<ContentType> supportedTypes
+            /*,
+            IEnumerable<ChunkCompression> supportedCompressions*/)
         {
             if (preferredChunkBytes == 0)
                 throw new DomainException("PreferredChunkBytes must be > 0.");
@@ -34,17 +35,17 @@ namespace ClipBeam.Domain.Devices
             if (types.Length == 0)
                 throw new DomainException("At least one SupportedType is required.");
 
-            var compressions = (supportedCompressions ?? [])
-                .Distinct()
-                .ToArray();
+            //var compressions = (supportedCompressions ?? [])
+            //    .Distinct()
+            //    .ToArray();
 
-            SupportsImages = supportsImages;
+            //SupportsImages = supportsImages;
             PreferredChunkBytes = preferredChunkBytes;
             MaxChunkBytes = maxChunkBytes;
-            SupportsAckWindow = supportsAckWindow;
+            //SupportsAckWindow = supportsAckWindow;
             SupportsHashDedup = supportsHashDedup;
             SupportedTypes = types;
-            SupportedChunkCompressions = compressions;
+            //SupportedChunkCompressions = compressions;
         }
 
         public bool Supports(ContentType type) => SupportedTypes.Contains(type);

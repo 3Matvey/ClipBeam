@@ -57,6 +57,7 @@ enum ExifOrientation {
 enum HashAlgo {
   HASH_ALGO_UNSPECIFIED = 0;
   HASH_ALGO_SHA256 = 1;
+  HASH_ALGO_CRC32 = 2;
 }
 
 // Text normalization applied before transmission.

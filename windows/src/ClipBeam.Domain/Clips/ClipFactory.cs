@@ -14,7 +14,7 @@ namespace ClipBeam.Domain.Clips
             string originDeviceId,
             ulong seq,
             string? text,
-            IHasherProvider hashers,
+            IHasherProvider? hashers,
             HashAlgo algo = HashAlgo.Sha256,
             DateTime? createdUtcOverride = null)
         {
@@ -22,8 +22,8 @@ namespace ClipBeam.Domain.Clips
 
             var content = TextClipContent.FromRaw(text);
 
-            var hasher = hashers.Get(algo);
-            var hash = hasher.Compute(content.Raw.Span);
+            var hasher = hashers?.Get(algo);
+            var hash = hasher?.Compute(content.Raw.Span);
 
             var createdUtc = createdUtcOverride ?? DateTime.UtcNow;
             if (createdUtc.Kind != DateTimeKind.Utc)
@@ -48,7 +48,7 @@ namespace ClipBeam.Domain.Clips
             ulong seq,
             ImageMeta imageMeta,
             ReadOnlyMemory<byte> encodedImageBytes,
-            IHasherProvider hashers,
+            IHasherProvider? hashers,
             HashAlgo algo = HashAlgo.Sha256,
             DateTime? createdUtcOverride = null)
         {
@@ -59,8 +59,8 @@ namespace ClipBeam.Domain.Clips
 
             var content = new ImageClipContent(imageMeta, encodedImageBytes);
 
-            var hasher = hashers.Get(algo);
-            var hash = hasher.Compute(content.Raw.Span);
+            var hasher = hashers?.Get(algo);
+            var hash = hasher?.Compute(content.Raw.Span);
 
             var createdUtc = createdUtcOverride ?? DateTime.UtcNow;
             if (createdUtc.Kind != DateTimeKind.Utc)

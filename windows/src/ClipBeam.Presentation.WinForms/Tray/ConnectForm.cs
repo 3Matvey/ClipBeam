@@ -1,4 +1,5 @@
 ﻿using ClipBeam.Application.Abstractions.Pairing;
+using ClipBeam.Application.Services.Pairing;
 
 
 namespace ClipBeam.Presentation.WinForms.Tray

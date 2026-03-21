@@ -13,6 +13,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Clipbeam.Infrastructure.Pairing\Clipbeam.Infrastructure.Pairing.csproj" />
+    <ProjectReference Include="..\ClipBeam.Infrastructure.Grpc\ClipBeam.Infrastructure.Grpc.csproj" />
+    <ProjectReference Include="..\ClipBeam.Platform.Windows.Clipboard\ClipBeam.Platform.Windows.Clipboard.csproj" />
     <ProjectReference Include="..\ClipBeam.Presentation.WinForms\ClipBeam.Presentation.WinForms.csproj" />
   </ItemGroup>
 

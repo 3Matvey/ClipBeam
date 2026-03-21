@@ -9,22 +9,22 @@ namespace ClipBeam.Domain.Clips
         public string OriginDeviceId { get; }
         public ulong Seq { get; }
         public ContentType Type { get; }
-        public Hash ContentHash { get; }
+        public Hash? ContentHash { get; }
         public ulong TotalSize { get; }
         public DateTime CreatedUtc { get; }
         public uint ProtoVersion { get; }
 
         public ImageMeta? ImageMeta { get; }
 
-        internal ClipMeta(
+        public ClipMeta(
             Guid clipId,
             string originDeviceId,
             ulong seq,
             ContentType type,
-            Hash contentHash,
             ulong totalSize,
             DateTime createdUtc,
             uint protoVersion,
+            Hash? contentHash,
             ImageMeta? imageMeta = null)
         {
             if (clipId == Guid.Empty)

@@ -14,7 +14,7 @@ namespace ClipBeam.Platform.Windows.Clipboard
     [SupportedOSPlatform("windows")]
     public sealed class WindowsClipboardPort(IHasherProvider hashers, string originDeviceId) : IClipboardPort, IDisposable
     {
-        private readonly StaThreadRunner _sta = new();
+          private readonly StaThreadRunner _sta = new();
         private readonly ClipboardChangeWindow _watcher = new();
 
         private readonly IHasherProvider _hashers = hashers 

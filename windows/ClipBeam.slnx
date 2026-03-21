@@ -2,6 +2,7 @@
   <Folder Name="/Solution Items/">
     <File Path="../proto/clipbeam.proto" />
   </Folder>
+  <Project Path="Clipbeam.Infrastructure.Pairing/Clipbeam.Infrastructure.Pairing.csproj" />
   <Project Path="src/ClipBeam.Application/ClipBeam.Application.csproj" />
   <Project Path="src/ClipBeam.Domain/ClipBeam.Domain.csproj" />
   <Project Path="src/ClipBeam.Host.Win/ClipBeam.Host.Win.csproj" />

@@ -13,7 +13,6 @@
   <ItemGroup>
     <Folder Include="Properties\" />
     <Folder Include="Protos\" />
-    <Folder Include="Transport\" />
   </ItemGroup>
 
   <ItemGroup>

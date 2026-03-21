@@ -22,8 +22,10 @@ namespace ClipBeam.Application.Services.Sync
                     paramName: nameof(meta),
                     message: $"{nameof(meta.TotalSize)} must be > 0 and < {int.MaxValue}.");
 
-            byte[] buffer = GC.AllocateUninitializedArray<byte>((int)meta.TotalSize);
+            if (_inflight.ContainsKey(meta.ClipId))
+                throw new InvalidOperationException($"Transfer already in progress: {meta.ClipId}");
 
+            byte[] buffer = GC.AllocateUninitializedArray<byte>((int)meta.TotalSize); //TODO
             _inflight[meta.ClipId] = new Inflight(meta, buffer);
         }
 
@@ -42,8 +44,7 @@ namespace ClipBeam.Application.Services.Sync
             int length = data.Length;
 
             if (destOffset + length > buffer.Length)
-                throw new ArgumentOutOfRangeException(
-                    nameof(offset),
+                throw new ArgumentOutOfRangeException(nameof(offset),
                     "Chunk goes out of bounds of allocated clip buffer.");
 
             data.Span.CopyTo(buffer.AsSpan(destOffset, length));
@@ -51,12 +52,12 @@ namespace ClipBeam.Application.Services.Sync
             if (!last)
                 return null;
 
+            if ((ulong)(destOffset + length) != (ulong)buffer.Length)
+                throw new InvalidOperationException("Last chunk does not end at total_size.");
+
             _inflight.Remove(clipId);
 
-            byte[] bytes = buffer;
-            ClipMeta meta = inflight.Meta;
-
-            return ClipFactory.FromMeta(meta, bytes, hasherProvider);
+            return ClipFactory.FromMeta(inflight.Meta, buffer, hasherProvider);
         }
     }
 }

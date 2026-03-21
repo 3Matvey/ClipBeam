@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Windows.Forms;
+using System.Threading;
 
 namespace ClipBeam.Presentation.WinForms.Tray
 {
@@ -13,6 +14,12 @@ namespace ClipBeam.Presentation.WinForms.Tray
         private readonly Func<ConnectForm> _connectFormFactory;
 
         private ConnectForm? _connectForm;
+
+        // Used to stop Kestrel / background loops etc.
+        private CancellationTokenSource? _shutdownCts;
+
+        // Prevent double-exit race
+        private int _exiting; // 0 = no, 1 = yes
 
         public TrayAppContext(Func<ConnectForm> connectFormFactory)
         {
@@ -40,43 +47,91 @@ namespace ClipBeam.Presentation.WinForms.Tray
                 Visible = true
             };
 
-            // двойной клик по иконке = открыть окно подключения
+            // Double click on icon = open connect window
             _tray.DoubleClick += (_, _) => ShowConnect();
         }
 
+        /// <summary>
+        /// Called by Bootstrapper/Program to connect tray exit with app shutdown.
+        /// </summary>
+        public void AttachShutdown(CancellationTokenSource shutdownCts)
+            => _shutdownCts = shutdownCts ?? throw new ArgumentNullException(nameof(shutdownCts));
+
         private void ShowConnect()
         {
-            // если окно уже есть — просто активируем
-            if (_connectForm is { IsDisposed: false })
+            // if already created and not disposed -> activate
+            if (_connectForm is { IsDisposed: false } existing)
             {
-                if (!_connectForm.Visible)
-                    _connectForm.Show();
+                if (!existing.Visible)
+                    existing.Show();
 
-                _connectForm.Activate();
+                existing.Activate();
                 return;
             }
 
-            _connectForm = _connectFormFactory.Invoke();
-            _connectForm.StartPosition = FormStartPosition.CenterScreen;
+            var form = _connectFormFactory.Invoke();
+            _connectForm = form;
 
-            // при закрытии формы мы НЕ выходим из приложения
-            _connectForm.FormClosed += (_, _) => _connectForm = null;
+            form.StartPosition = FormStartPosition.CenterScreen;
 
-            _connectForm.Show();
+            // when user closes it, we just drop reference
+            form.FormClosed += (_, _) =>
+            {
+                if (ReferenceEquals(_connectForm, form))
+                    _connectForm = null;
+            };
+
+            form.Show();
         }
 
         private void Exit()
         {
-            _tray.Visible = false;
-            _tray.Dispose();
+            // guard against double-clicks/races
+            if (Interlocked.Exchange(ref _exiting, 1) == 1)
+                return;
 
-            if (_connectForm is { IsDisposed: false })
+            // 1) Tell host/server to stop
+            try { _shutdownCts?.Cancel(); } catch { /* ignore */ }
+
+            // 2) Dispose tray icon
+            try
             {
-                _connectForm.Close();
-                _connectForm.Dispose();
+                _tray.Visible = false;
+                _tray.Dispose();
+            }
+            catch { /* ignore */ }
+
+            // 3) Close/Dispose connect form safely
+            var form = _connectForm;
+            _connectForm = null;
+
+            if (form is not null && !form.IsDisposed)
+            {
+                try
+                {
+                    // Ensure it's on UI thread
+                    if (form.InvokeRequired)
+                    {
+                        form.Invoke(new Action(() =>
+                        {
+                            try { form.Close(); } catch { }
+                            try { form.Dispose(); } catch { }
+                        }));
+                    }
+                    else
+                    {
+                        try { form.Close(); } catch { }
+                        try { form.Dispose(); } catch { }
+                    }
+                }
+                catch
+                {
+                    // do not crash on exit
+                }
             }
 
-            ExitThread(); // корректно завершает ApplicationContext
+            // 4) End WinForms message loop
+            ExitThread();
         }
     }
 }

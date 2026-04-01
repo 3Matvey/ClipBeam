@@ -2,7 +2,6 @@
   <Folder Name="/Solution Items/">
     <File Path="../proto/clipbeam.proto" />
   </Folder>
-  <Project Path="Clipbeam.Infrastructure.Pairing/Clipbeam.Infrastructure.Pairing.csproj" />
   <Project Path="src/ClipBeam.Application/ClipBeam.Application.csproj" />
   <Project Path="src/ClipBeam.Domain/ClipBeam.Domain.csproj" />
   <Project Path="src/ClipBeam.Host.Win/ClipBeam.Host.Win.csproj" />
@@ -10,4 +9,6 @@
   <Project Path="src/ClipBeam.Platform.Windows.Clipboard/ClipBeam.Platform.Windows.Clipboard.csproj" />
   <Project Path="src/ClipBeam.Presentation.WinForms/ClipBeam.Presentation.WinForms.csproj" />
   <Project Path="src/ClipBeam.Proto/ClipBeam.Proto.csproj" />
+  <Project Path="src/ClipBeam.App/ClipBeam.App.csproj"/>
+  <Project Path="src/Clipbeam.Infrastructure.Pairing/Clipbeam.Infrastructure.Pairing.csproj"/>
 </Solution>
